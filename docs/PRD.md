@@ -104,19 +104,16 @@ No frameworks or libraries are allowed.
 
 Below is the task split across three team members, matching the project architecture and file responsibilities.
 
+ 
 ### Panagiotis → Data Layer
  
 **Files:** `api.js`, `state.js`, `live.js`, `utils.js`, `main.js`
  
-- [ ] Fetch ID lists per post type (e.g. `fetch('/topstories.json')`, `/jobstories.json`, `/askstories.json`)
-- [ ] Fetch individual items by ID (e.g. `fetch('/item/{id}.json')`)
-- [ ] Fetch items in parallel batches of 20 (e.g. `Promise.all(ids.map(fetchItem))`)
-- [ ] Cache every fetched item by ID to avoid re-fetching (e.g. `const cache = {}; if (cache[id]) return cache[id]`)
-- [ ] Fetch live updates on a 5-second interval (e.g. `setInterval(() => fetch('/updates.json'), 5000)`)
-- [ ] Regulate requests to prevent API overload (e.g. `throttle`, `debounce` utilities in `utils.js`)
-- [ ] Store and export all UI state in one object (e.g. `{ activeTab, allIds, loadedIds, currentOffset, openPostId, notifiedIds }`)
-- [ ] Wire all modules together and trigger initial load (e.g. `main.js` imports and calls init functions in order)
-- [ ] Complete when: all data flows correctly to Katerina's render functions, nothing is fetched twice, live polling fires every 5 seconds
+- [ ] Build all API fetch functions with caching and error handling (e.g. fetch by ID, fetch ID lists by type, batch fetch with `Promise.all`, cache by ID to never re-fetch)
+- [ ] Detect live updates and flag which visible posts changed (e.g. `setInterval` every 5 seconds, compare `/updates.json` result against `state.loadedIds`)
+- [ ] Regulate all requests to prevent API overload (e.g. `throttle` for polling, `debounce` for scroll, `formatTime` for timestamps — all exported from `utils.js`)
+- [ ] Define and export central state, wire all modules together and trigger initial load
+- [ ] Complete when: data flows correctly to Katerina's render functions, nothing is fetched twice, live polling fires every 5 seconds without overloading the API
 
 ---
  
@@ -124,37 +121,25 @@ Below is the task split across three team members, matching the project architec
  
 **Files:** `feed.js`, `post.js`, `comments.js`, `index.html`, `style.css`, `main.js`
  
-- [ ] Render feed with stories, jobs and polls (e.g. a card or row per post showing title, author, score, time, type)
-- [ ] Display posts ordered newest to oldest (e.g. sort by `item.time` descending before rendering)
-- [ ] Load posts in batches, not all at once (e.g. scroll event or "Load More" button that fetches the next 20)
-- [ ] Open a post detail view on click without a page reload (e.g. hide feed, show detail panel, back button restores feed)
-- [ ] Render poll options with scores inside the post detail view (e.g. list each `pollopt` with its `score`)
-- [ ] Render comments under their parent post, ordered newest to oldest (e.g. sort `kids` by `time` descending)
-- [ ] Show which post each comment belongs to (e.g. display parent post title above or within the comment)
-- [ ] Handle deleted or missing comments gracefully (e.g. show `[removed]` or skip silently)
+- [ ] Render the feed with tabs for each post type, posts ordered newest to oldest, loading in batches of 20 (e.g. scroll event or "Load More" button, stop when all IDs are exhausted)
+- [ ] Render a post detail view on click with all fields, poll options with scores, a back control, and graceful handling of missing or null fields
+- [ ] Render comments newest to oldest under their parent post, handling deleted comments without crashing (e.g. show `[removed]` or skip)
 - [ ] Show a notification when a visible post is updated (e.g. banner or badge that auto-clears after 5 seconds)
-- [ ] *!Bonus!* Render nested sub-comments indented under their parent (e.g. recursive render function with `paddingLeft` per depth level)
+- [ ] *!Bonus!* Render nested sub-comments indented under their parent and add Ask/Show tabs
 - [ ] Complete when: all three post types open without errors, comments are in order with correct parent, load more works without spam, notification appears on update
 
 ---
  
 ### Kyriakos → QA & Audit
  
-**No files owned - responsible for testing, flagging bugs and verifying audit compliance.**
+**No files owned — responsible for testing, flagging bugs and verifying audit compliance.**
  
-- [ ] Open a story post — verify it opens without errors
-- [ ] Open a job post — verify it opens without errors
-- [ ] Open a poll post — verify it opens without errors
-- [ ] Trigger load more — verify new posts load without errors and without spamming the user
-- [ ] Open a post with comments — verify comments display newest to oldest
-- [ ] Verify the UI has at least stories, jobs and polls
-- [ ] Verify all posts in the feed are ordered newest to oldest
-- [ ] Verify each comment shows the correct parent post
-- [ ] Verify the user is notified when a post is updated
-- [ ] Verify throttling limits live data requests to every 5 seconds
-- [ ] *!Bonus!* Verify sub-comments are nested correctly
-- [ ] *!Bonus!* Verify additional post types beyond stories, jobs and polls are present
-- [ ] Complete when: every item above passes and all found bugs have been flagged and fixed
+- [ ] Verify all three post types (story, job, poll) open without errors
+- [ ] Verify feed and comments are ordered newest to oldest, each comment shows correct parent
+- [ ] Verify load more works without spamming, throttling limits requests to every 5 seconds
+- [ ] Verify user is notified when a post is updated
+- [ ] *!Bonus!* Verify nested sub-comments and additional post types
+- [ ] Complete when: every audit item passes and all flagged bugs are fixed
 
 ---
 
