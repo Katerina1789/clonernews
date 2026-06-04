@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClonerNews</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 class="site-logo">ClonerNews</h1>
+
+      <!-- Tab buttons — data-feed-type maps to API types in feed.js -->
+      <nav class="feed-tabs">
+        <button class="tab-btn active" data-feed-type="all">All</button>
+        <button class="tab-btn" data-feed-type="story">Stories</button>
+        <button class="tab-btn" data-feed-type="job">Jobs</button>
+        <button class="tab-btn" data-feed-type="poll">Polls</button>
+      </nav>
+    </header>
+
+    <main class="site-main">
+      <!-- Feed view: post list + controls -->
+      <div id="feed-view">
+        <div id="feed"></div>
+        <p id="spinner" hidden class="spinner">Loading…</p>
+        <button id="load-more-btn" class="load-more-btn">Load more</button>
+      </div>
+
+      <!-- Detail view: shown when a post is opened -->
+      <div id="detail-view" hidden></div>
+    </main>
+
+    <!-- JS modules loaded in dependency order -->
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
