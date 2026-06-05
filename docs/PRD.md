@@ -104,108 +104,42 @@ No frameworks or libraries are allowed.
 
 Below is the task split across three team members, matching the project architecture and file responsibilities.
 
----
-
-###  -> Data & Live Layer
-
-**Responsible for all API communication, caching, state management and live update polling.**
-
-**Files:** `api.js`, `state.js`, `live.js`
-
-**Tasks:**
-
-- **API & Cache** (`api.js`)
-  - [ ] Implement `fetchIds(type)` — fetches the full ID list for a given post type (stories, jobs, polls)
-  - [ ] Implement `fetchItem(id)` — fetches a single item by ID, checks cache first
-  - [ ] Implement `fetchBatch(ids)` — fetches an array of IDs in parallel using `Promise.all`
-  - [ ] Implement `fetchUpdates()` — fetches `/updates.json` for live data
-  - [ ] In-memory cache object: before any fetch, return cached item if it exists
-  - [ ] All fetch functions must handle network errors gracefully and not crash the app
-  - [ ] Complete when: any module can call these functions, data is returned correctly, and the same ID is never fetched twice in a session
-
-- **State** (`state.js`)
-  - [ ] Define and export the central state object containing: `activeTab`, `allIds`, `loadedIds`, `currentOffset`, `pageSize`, `openPostId`, `lastUpdatedIds`, `notifiedIds`
-  - [ ] Complete when: all modules import from one shared state object with no local copies of the same data
-
-- **Live Updates** (`live.js`)
-  - [ ] Start a `setInterval` polling loop that calls `fetchUpdates()` every 5 seconds
-  - [ ] Compare returned changed IDs against `state.loadedIds`
-  - [ ] If intersection found, trigger a notification in the UI
-  - [ ] Store notified IDs in `state.notifiedIds` to avoid duplicate notifications
-  - [ ] Complete when: a notification visibly appears within 5 seconds of a post update, and the same post is not notified twice in a row
+ 
+### Panagiotis → Data Layer
+ 
+**Files:** `api.js`, `state.js`, `live.js`, `utils.js`, `main.js`
+ 
+- [ ] Build all API fetch functions with caching and error handling (e.g. fetch by ID, fetch ID lists by type, batch fetch with `Promise.all`, cache by ID to never re-fetch)
+- [ ] Detect live updates and flag which visible posts changed (e.g. `setInterval` every 5 seconds, compare `/updates.json` result against `state.loadedIds`)
+- [ ] Regulate all requests to prevent API overload (e.g. `throttle` for polling, `debounce` for scroll, `formatTime` for timestamps — all exported from `utils.js`)
+- [ ] Define and export central state, wire all modules together and trigger initial load
+- [ ] Complete when: data flows correctly to Katerina's render functions, nothing is fetched twice, live polling fires every 5 seconds without overloading the API
 
 ---
-
-###  -> Feed & Navigation Layer
-
-**Responsible for the post list, pagination, tab switching and overall app wiring.**
-
-**Files:** `feed.js`, `utils.js`, `main.js`
-
-**Tasks:**
-
-- **Feed Rendering** (`feed.js`)
-  - [ ] On tab load, call `fetchIds(type)` and store result in `state.allIds`, reset `state.currentOffset` to 0
-  - [ ] Slice `state.allIds` from `currentOffset` to `currentOffset + pageSize`, fetch and render that batch
-  - [ ] Each rendered post shows: title, author, score, type label, formatted time, comment count
-  - [ ] Handle posts with missing fields — display a dash or skip the field, never crash
-  - [ ] After rendering a batch, advance `state.currentOffset` and push IDs into `state.loadedIds`
-  - [ ] Complete when: 20 posts render on load, all three types display correctly, and missing fields do not cause errors
-
-- **Load More** (`feed.js`)
-  - [ ] Attach a scroll event listener or "Load More" button that triggers the next batch fetch
-  - [ ] Use the debounce utility to prevent firing multiple requests from a single scroll
-  - [ ] Stop triggering when `state.currentOffset >= state.allIds.length`
-  - [ ] Complete when: scrolling or clicking loads exactly the next 20 posts without duplicate requests or crashes
-
-- **Tab Switching** (`feed.js`)
-  - [ ] Clicking a tab (Stories / Jobs / Polls) resets state and re-renders the feed for that type
-  - [ ] *!Bonus!* Add an "Ask" and "Show" tab using `/askstories.json` and `/showstories.json`
-  - [ ] Complete when: switching tabs clears the current feed and loads fresh content for the selected type
-
-- **Utilities** (`utils.js`)
-  - [ ] Implement `throttle(fn, delay)` — executes fn at most once per delay ms
-  - [ ] Implement `debounce(fn, delay)` — executes fn only after delay ms of inactivity
-  - [ ] Implement `formatTime(unixTimestamp)` — returns a readable relative time string (e.g. "3 hours ago")
-  - [ ] Complete when: throttle is used in `live.js`, debounce is used in `feed.js`, and time displays correctly on all posts
-
-- **App Wiring** (`main.js`)
-  - [ ] Import and initialize all modules in the correct order
-  - [ ] Trigger the initial feed load on page ready
-  - [ ] Start the live update polling loop
-  - [ ] Complete when: the app loads end-to-end with a single entry point and no circular dependencies
+ 
+### Katerina → UI Layer
+ 
+**Files:** `feed.js`, `post.js`, `comments.js`, `index.html`, `style.css`, `main.js`
+ 
+- [ ] Render the feed with tabs for each post type, posts ordered newest to oldest, loading in batches of 20 (e.g. scroll event or "Load More" button, stop when all IDs are exhausted)
+- [ ] Render a post detail view on click with all fields, poll options with scores, a back control, and graceful handling of missing or null fields
+- [ ] Render comments newest to oldest under their parent post, handling deleted comments without crashing (e.g. show `[removed]` or skip)
+- [ ] Show a notification when a visible post is updated (e.g. banner or badge that auto-clears after 5 seconds)
+- [ ] *!Bonus!* Render nested sub-comments indented under their parent and add Ask/Show tabs
+- [ ] Complete when: all three post types open without errors, comments are in order with correct parent, load more works without spam, notification appears on update
 
 ---
-
-###  -> Post Detail & Comments Layer
-
-**Responsible for rendering individual posts, comment threads and the notification UI.**
-
-**Files:** `post.js`, `comments.js`
-
-**Tasks:**
-
-- **Post Detail** (`post.js`)
-  - [ ] On post click, set `state.openPostId` and render the detail view
-  - [ ] Detail view displays: title, URL or full text, author, score, formatted time, type label
-  - [ ] If type is `poll`, fetch and display each `pollopt` with its score
-  - [ ] A back/close control returns the user to the feed without a page reload
-  - [ ] Complete when: clicking any story, job and poll opens its detail view with all available fields and no console errors
-
-- **Comments** (`comments.js`)
-  - [ ] Fetch all `kids` IDs from the open post using `fetchBatch()`
-  - [ ] Sort fetched comments by `time` descending before rendering
-  - [ ] Each comment displays: author, formatted time, comment body, and a reference to the parent post title
-  - [ ] Handle deleted/dead comments — display `[removed]` or skip, never crash
-  - [ ] *!Bonus!* For each comment that has its own `kids`, recursively fetch and render sub-comments indented below the parent
-  - [ ] *!Bonus!* Nested comments render to any depth without hardcoding a limit
-  - [ ] Complete when: all comments appear below a post in newest-to-oldest order, each showing correct parent, and removed comments do not break the thread
-
-- **Notification UI** (`post.js` or inline in `index.html`)
-  - [ ] Render a notification banner or badge when `live.js` signals an update
-  - [ ] Notification identifies which post was updated (by title or ID)
-  - [ ] Notification is dismissable or auto-clears after 5 seconds
-  - [ ] Complete when: notification appears within one polling cycle of an update and does not stack infinitely
+ 
+### Kyriakos → QA & Audit
+ 
+**No files owned — responsible for testing, flagging bugs and verifying audit compliance.**
+ 
+- [ ] Verify all three post types (story, job, poll) open without errors
+- [ ] Verify feed and comments are ordered newest to oldest, each comment shows correct parent
+- [ ] Verify load more works without spamming, throttling limits requests to every 5 seconds
+- [ ] Verify user is notified when a post is updated
+- [ ] *!Bonus!* Verify nested sub-comments and additional post types
+- [ ] Complete when: every audit item passes and all flagged bugs are fixed
 
 ---
 
