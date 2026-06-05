@@ -1,4 +1,4 @@
-# ->ClonerNews
+# ClonerNews
 
 [![JavaScript](https://img.shields.io/badge/JavaScript-Code-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![License](https://img.shields.io/badge/License-MIT-FF0000?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
@@ -85,7 +85,7 @@ Full checklist in [`audit/audit_guide.md`](audit/audit_guide.md).
 
 - Katerina Kasdanastasi
 - Panagiotis Valadakis
-- Panagiotis Valadakis
+- Kyriakos Lamprianidis
 
 ## License
 
