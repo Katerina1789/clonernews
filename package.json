@@ -1,0 +1,17 @@
+{
+  "name": "clonernews",
+  "version": "1.0.0",
+  "description": "A minimal HackerNews client built with vanilla JavaScript.",
+  "author": "Katerina Kasdanastasi, Panagiotis Valadakis and Kyriakos Lamprianidis",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://platform.zone01.gr/git/kkasdana/clonernews.git"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "npx http-server . -c-1"
+  }
+}
