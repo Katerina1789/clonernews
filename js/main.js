@@ -1,5 +1,6 @@
 import { startLiveUpdates, stopLiveUpdates } from "./live.js";
 import {
+  closePost,
   clearChangedVisiblePostIds,
   loadInitialPosts,
   loadMorePosts,
@@ -76,6 +77,9 @@ function registerUIEvents() {
   // Tab switch — reset feed with the new type.
   window.addEventListener("clonernews:change-type", async (event) => {
     const type = event.detail?.type || "all";
+    closePost();
+    document.getElementById("feed-view").hidden = false;
+    document.getElementById("detail-view").hidden = true;
     await loadAndEmitPosts(type, true);
   });
 
