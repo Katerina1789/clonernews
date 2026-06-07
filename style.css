@@ -59,6 +59,7 @@ button:focus-visible,
   letter-spacing: 0.05em;
   padding: 1rem 0;
   white-space: nowrap;
+  user-select: none;
 }
 
 /* ── Tabs ── */
@@ -80,6 +81,7 @@ button:focus-visible,
     border-color 0.15s;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  user-select: none;
 }
 .tab-btn:hover {
   color: var(--text);
